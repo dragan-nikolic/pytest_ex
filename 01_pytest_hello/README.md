@@ -9,6 +9,6 @@ Example from [Effective Python Testing With Pytest](https://realpython.com/pytes
 ## Test run
 
 * python -m venv venv
-* source venv/bin/activate
+* activate venv (for instructions refer to README in repo root folder)
 * pip install -r requirements.txt
 * pytest
