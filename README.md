@@ -6,8 +6,11 @@ pytest learning
 
 ### How to ativate venv on different platforms
 
-* Linux/Mac: venv/bin/activate
-* Windows: venv/Scripts/activate.bat
+* Linux/Mac
+  * `$ source venv/bin/activate`
+* Windows
+  * Command: `> venv/Scripts/activate.bat`
+  * PowerShell: `> venv/Scripts/Activate.ps1`
 
 ## References
 

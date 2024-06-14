@@ -1,14 +1,6 @@
-# pytest Hello
+# Custom command line parameters
 
-Example from [pytest get started](https://docs.pytest.org/en/7.4.x/getting-started.html#group-multiple-tests-in-a-class).
+Demo how to use custom command line parameters.
 
-## Dependencies
+For info how to run the tests refer to the 01_pytest_hello.
 
-* python 3.3 or newer
-
-## Test run
-
-* python -m venv venv
-* source venv/bin/activate
-* pip install -r requirements.txt
-* pytest

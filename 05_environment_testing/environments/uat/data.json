@@ -1,0 +1,8 @@
+{
+  "idh.t_ddo.period_flash_comp_sales": "idh_uat.t_ddo.period_flash_comp_sales",
+
+  "idm.comp_sales.comp_sales_channel_period_level": "idm_uat.comp_sales.comp_sales_channel_period_level",
+  "idm.coredim.channel_dim": "idm_uat.coredim.channel_dim",
+
+  "ids.int_ref.date_dim": "ids_uat.int_ref.date_dim"
+}
