@@ -9,8 +9,8 @@ pytest learning
 * Linux/Mac
   * `$ source venv/bin/activate`
 * Windows
-  * Command: `> venv/Scripts/activate.bat`
-  * PowerShell: `> venv/Scripts/Activate.ps1`
+  * Command: `> venv\Scripts\activate.bat`
+  * PowerShell: `PS> .\venv\Scripts\Activate.ps1`
 
 ## References
 
