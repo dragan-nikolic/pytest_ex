@@ -1,0 +1,355 @@
+
+Pytest With Eric
+
+Home
+Categories
+Search
+Table of ContentsOverview
+Eric Sales De Andrade
+
+Learn to write production level Python Unit Tests with Pytest
+73
+posts
+35
+categories
+283
+tags
+E-Mail GitHub Twitter
+How To Use Pytest Logging And Print To Console And File (A Practical Guide)
+ Posted on 2023-07-12
+  Edited on 2024-06-21
+  In Intermediate , Pytest Configuration
+ Word count in article: 2.1k
+  Reading time ≈ 8 mins.
+While developing software, keeping track of events is crucial.
+
+Logging helps you understand the execution flow of your code, to help catch bugs when they happen.
+
+Although Pytest is great testing framework, it doesn’t automatically display the output of print statements or logs, which can be a problem when trying to debug failing tests or understanding flow.
+
+So how do you go about logging and viewing events during Testing?
+
+Can you override the default logging behavior set in the source code, just for testing?
+
+What if you want to output logs to a file instead of the console?
+
+The answer is yes, made possible via Pytest logging. Pytest allows you to create and even override log handlers.
+
+Pytest allows you to do this at the console and file level. You can also change the log level at a single test level using the caplog fixture.
+
+In this article, we’ll look at how to use Pytest logging to output logs to the console and file, disable logs, and use the caplog fixture.
+
+Let’s get into it.
+
+Link To GitHub Repo
+
+Logging vs Print Statements
+Print statements are difficult to manage and provide little information about your programs’s execution flow.
+
+You have no control over which statements you should print (all print statements are executed by default) and which should not, making it more difficult to debug your code.
+
+Logging records important events as they occur but also stores them in an organized format for subsequent review and analysis, including control over various levels, thus preferred over print statements.
+
+Custom Logger vs Inbuilt Logging
+Python’s built-in logging module doesn’t always cater to your specific needs or preferences of different projects. For example, in a complex project it’s harder to pin-point a specific line of execution if you use the same logger for all modules.
+
+That’s where a custom logger comes to the rescue.
+
+A custom logger gives you more control, allowing you to configure its behavior to suit your specific requirements.
+
+For example, you can set it to display only certain types of messages or output logs to multiple destinations.
+
+Python’s built-in logging module provides five standard levels indicating the severity of events:
+
+- NOTSET (0): This level captures all messages, regardless of their severity.
+- DEBUG (10): This level is used for anything that can help identify potential problems, like variable values or the steps that a program takes.
+- INFO (20): This level is used to confirm that things are working as expected.
+- WARNING (30): This level indicates that something unexpected happened, or there may be some problem in the near future (like ‘disk space low’). However, the software is still working as expected.
+- ERROR (40): This level indicates a more serious problem that prevented the software from performing a function.
+- CRITICAL (50): This level denotes a very serious error that might prevent the program from continuing to run.
+
+A custom logger allows you to define and work with these levels more conveniently, further enhancing the precision and control of your logging process.
+
+Objectives
+The primary objective of this article is to guide you through the process of setting up Pytest logging in a Python application.
+
+We will explore how to output logs in Pytest, how to disable logs, and how to change the log level at a single test level.
+
+Project Set Up
+The project has the following structure
+
+.
+├── .gitignore
+├── pytest.ini
+├── readme.md
+├── requirements.txt
+├── src
+│   ├── __init__.py
+│   ├── custom_logger.py
+│   └── temp_convertor.py
+└── tests
+    ├── __init__.py
+    └── test_temp_convertor.py
+Getting Started
+To get started, clone the repo here, or you can create your own repo by creating a folder and running git init to initialise it.
+
+Prerequisites
+To follow this guide, you should have:
+
+Python 3.12 or higher.
+Basic understanding of Python’s logging module.
+An elementary grasp of pytest.
+Create a virtual environment and install the requirements (packages) using
+
+pip  install  -r  requirements.txt
+Source Code
+Now let’s delve into some code to understand how to implement logging in a simple Python application.
+
+Consider a simple temperature conversion utility called ‘temp_convertor’.
+
+The utility comprises two functions fahrenheit_to_celsius and celsius_to_fahrenheit, converting the temperature from Fahrenheit to Celsius and vice-versa, respectively.
+
+src/temp_convertor.py
+
+from custom_logger import console_logger, LogLevel
+
+c_logger = console_logger(name="temp_convertor", level=LogLevel.DEBUG)
+
+
+def fahrenheit_to_celsius(fahrenheit: float) -> float:
+    """
+    Convert the specified Fahrenheit temperature to Celsius and return it.
+    Input: fahrenheit: float
+    Output: celsius: float
+    """
+    c_logger.debug(f"Converting {fahrenheit}°F to Celsius.")
+    celsius = round((fahrenheit - 32) * 5 / 9, 2)
+    c_logger.info(f"Result: {celsius}°C")
+    return celsius
+
+
+def celsius_to_fahrenheit(celsius: float) -> float:
+    """Convert the specified Celsius temperature to Fahrenheit and return it.
+    Input: celsius: float
+    Output: fahrenheit: float
+    """
+    c_logger.debug(f"Converting {celsius}°C to Fahrenheit.")
+    fahrenheit = round((celsius * 9 / 5) + 32, 2)
+    c_logger.info(f"Result: {fahrenheit}°F")
+    return fahrenheit
+
+
+if __name__ == "__main__":
+    fahrenheit_to_celsius(90)
+    celsius_to_fahrenheit(19)
+We used a custom logger, configured to display log messages at the DEBUG level.
+
+Creating your own logger gives you control over the logger’s behavior, allowing you to customize it to suit your specific requirements.
+
+src/custom_logger.py
+
+import logging
+from enum import Enum
+
+
+class LogLevel(Enum):
+    DEBUG = logging.DEBUG  # 10
+    INFO = logging.INFO  # 20
+    WARNING = logging.WARNING  # 30
+    ERROR = logging.ERROR  # 40
+    CRITICAL = logging.CRITICAL  # 50
+
+
+def console_logger(name: str, level: LogLevel) -> logging.Logger:
+    # Create a named logger
+    logger = logging.getLogger(f"__{name}__")
+    logger.setLevel(level.value)  # Set logger level using enum value
+
+    # Create a console handler and set its level
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(level.value)
+
+    # Set the formatter for the console handler
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%m/%d/%Y %I:%M:%S%p",
+    )
+    console_handler.setFormatter(formatter)
+
+    # Add the console handler to the logger
+    logger.addHandler(console_handler)
+
+    return logger
+The console_logger function creates a logger with a specified name and log level.
+
+Let’s run this code to make sure it works before we write the unit tests.
+
+python src/temp_convertor.py
+Output of temp_convertor.py
+
+Unit Tests
+Now that we have our source code ready, let’s write some unit tests to verify the functionality of the temp_convertor utility.
+
+tests/test_temp_convertor.py
+
+from src.temp_convertor import fahrenheit_to_celsius, celsius_to_fahrenheit
+
+def test_fahrenheit_to_celsius():
+    assert fahrenheit_to_celsius(90) == 32.22
+
+
+def test_celsius_to_fahrenheit():
+    assert celsius_to_fahrenheit(19) == 66.2
+Running this
+
+pytest
+Output of pytest
+
+By default, Pytest captures logs and only displays them when a test fails. This helps keep the console output tidy and focused on what you most need to see.
+
+You can disable log capture using the -s flag to view log outputs in real-time.
+
+pytest  -s
+The following output will be displayed.
+
+Output of pytest -s
+
+This is good.
+
+How about if you want to override the loggers set in the source code just for testing?
+
+Maybe a different format, different log-level or even output to a file?
+
+Pytest makes this super easy. Let’s see how.
+
+Define and Override Logging in Pytest
+Pytest offers various ways to control logging during the testing process. One such method is to define and override the default logging format through the CLI.
+
+Define Logging via CLI
+Pytest allows you to customize the log output format and date format via command-line options. This flexibility enables you to adjust log presentation according to your specific needs. Here’s an example:
+
+pytest  --log-cli-level=INFO  --log-format="%(asctime)s %(levelname)s %(message)s"  --log-date-format=" %Y-%m-%d %H:%M"
+In this command, log-format sets the format of the logged message itself, while log-date-format sets the format of the timestamp in the logged message.
+
+Output of Define Logging via CLI Commands
+
+You can see we’ve overridden the log format and level to INFO.
+
+Define Logging via Config File (pytest.ini)
+For a more permanent configuration, you can set log parameters in a pytest.ini file.
+
+This file allows you to enable CLI logging by default and specify the default log level. Here’s an example of how the pytest.ini configuration might look:
+
+pytest.ini
+
+[pytest]
+log_cli = true
+log_cli_level = DEBUG
+log_cli_format = %(asctime)s %(levelname)s %(message)s
+log_cli_date_format = %Y-%m-%d %H:%M:%S
+In this configuration, we’ve defined several log parameters:
+
+log_cli: Enables logging to the console.
+log_cli_level: Sets the log level to DEBUG.
+log_cli_format: Sets the format of the logged message.
+log_cli_date_format: Sets the format of the timestamp in the logged message.
+For more detailed information on configuring pytest.ini for logging and other Pytest best practices, you can refer to our extensive guide on How To Use Configure Pytest using pytest.ini.
+
+Running this, we get the live logs for each test from the DEBUG level.
+
+Output of Define Logging via Config File
+
+Write Logs To A File.
+In addition to displaying log outputs in the command-line, you can also write them to a file for later review or record-keeping.
+
+This requires adding a file handler to the logger in your config file. The process is similar to what we saw in the source code above.
+
+[pytest]
+log_file = logs/temp_convertor_tests_run.log
+log_file_date_format = %Y-%m-%d %H:%M:%S
+log_file_format = %(asctime)s - %(name)s %(levelname)s %(message)s
+log_file_level = DEBUG
+Running this generates a local log file.
+
+pytest
+The log file will be created in the logs directory with the name temp_convertor_tests_run.log.
+
+Output of Write Logs To A File
+
+You can read more about logging to files here.
+
+Disabling Logs Completely
+There are cases where you might not want to see any log output, even when tests fail. Pytest provides an option to suppress all log output:
+
+pytest  --show-capture=no
+With this command, Pytest will disable reporting of captured content (stdout, stderr and logs) on failed tests completely.
+
+Here’s an interesting article on How to Capture Output Logging in Pytest that you can refer to for more information on asserting the error messages.
+
+Changing Log Level at a Single Test Level
+There may be times when you want to change the log level for a specific test, perhaps to debug that test or reduce noise in the log output. Pytest’s caplog fixture allows you to do this.
+
+The Caplog Fixture
+The caplog fixture is a powerful tool for controlling and interacting with logs in your tests. With caplog, you can temporarily change the log level, capture log messages for assertion, and more.
+
+/tests/test_temp_convertor.py
+
+def test_celsius_to_fahrenheit_caplog_ex(caplog):
+    caplog.set_level(logging.DEBUG, logger="__temp_convertor__")  # Override log level
+    assert celsius_to_fahrenheit(300) == 572.0
+    print("Printing Caplog records....")
+    for record in caplog.records:  # Print Caplog records
+        print(record.levelname, record.message)
+The above test function named test_celsius_to_fahrenheit_caplog_ex, utilizes the caplog fixture from Pytest library to set the log level to INFO for the test and access the log messages.
+
+We wrote a complete article on How to Use Pytest’s Caplog Fixture that you can refer to for more information.
+
+Run the test using the following command:
+
+pytest tests/test_temp_convertor.py::test_celsius_to_fahrenheit_caplog_ex -s
+Output of Changing Log Level at a Single Test Level
+
+The output shows that the log level was set to INFO for the test, and the log messages can be accessed and printed using record.levelname and record.message.
+
+Similarly, you can change the level to DEBUG.
+
+Output of Changing Log Level to DEBUG
+
+Logging Plugins
+Pytest provides plugins that you can use to customize and extend logging capabilities. Two popular plugins are pytest-print and pytest-logger:
+
+pytest-print enables you to print messages to stdout during test execution, providing additional visibility of log outputs.
+pytest-logger provides you a sophisticated pre-test logging and log file management, enhancing the logging capabilities of pytest.
+Conclusion
+In this comprehensive guide, we covered various aspects of using logging and print statements in Pytest.
+
+Through practical examples, you learned how to create a custom logger, write logs to a file, and override loggers set in the source code for testing purposes.
+
+Then we explored how to configure logging through the CLI and pytest.ini file, use plugins to extend logging capabilities, disable logs, and change the log level at a single test level using the caplog fixture.
+
+By effectively using Pytest logging, you can gain better visibility into your test execution, debug your code more efficiently, and track important events throughout the testing process.
+
+If you have any ideas for improvement or like me to cover any topics please comment below or send me a message via Twitter, GitHub or Email.
+
+Till the next time… Cheers!
+
+Additional Reading
+Python’s logging module
+Pytest’s logging documentation
+pytest debug print logging in real time
+How to manage logging - pytest documentation
+The Ultimate Guide To Capturing Stdout/Stderr Output In Pytest
+What Is pytest.ini And How To Save Time Using Pytest Config
+What Is Pytest Caplog? (Everything You Need To Know)
+Python Unit Testing Best Practices For Building Reliable Applications
+
+# pytest logging# caplog
+Share
+Facebook
+Twitter
+LinkedIn
+Reddit
+ How To Test Python Exception Handling Using Pytest Assert (A Simple Guide)
+Pytest vs Unittest (Honest Review Of The 2 Most Popular Python Testing Frameworks) 
+© 2024Eric Sales De Andrade
+ Word count total: 173k   Reading time total ≈ 10:29
