@@ -3,14 +3,16 @@
 ## Requirements
 * Python (3.10+)
 
-Please install the dependencies via the `requirements.txt` file using 
-```commandline
-pip install -r requirements.txt
-```
-If you don't have Pip installed please follow instructions online on how to do it.
+For the instructions how to setup pytest and run the tests refer to the root README.
 
 ## How To Run the Unit Tests
 To run the Unit Tests, from the root of the repo run
 ```commandline
 pytest ./tests/unit/ -v -s
 ```
+
+## References
+
+* [Coverage.py documentation](https://coverage.readthedocs.io/en/7.6.9/)
+* [pytest-cov documentation](https://pytest-cov.readthedocs.io/en/latest/reporting.html)
+* [Code coverage with pytest](https://medium.com/@sumanrbt1997/code-coverage-with-pytest-1f72653b0bf2)

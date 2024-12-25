@@ -1,6 +1,6 @@
 # Demo custom command line variables
 
-For info how to run the tests refer to the 01_pytest_hello.
+For info how to run the tests refer to the 01_pytest_hello readme file.
 
 ## Expected results
 
